@@ -1,0 +1,11 @@
+curl -X POST http://localhost:3000/api/analytics -H "Content-Type: application/json" -d '{"queries": [{"table": "call", "name": "costAndDurationMetrics", "operations": [{"operation": "sum", "column": "cost"}, {"operation": "sum", "column": "duration"}, {"operation": "avg", "column": "duration"}]}]}'
+
+
+
+
+curl -X POST https://api.vapi.ai/analytics -H "Content-Type: application/json" -d '{"queries": [{"table": "call","name": "string","operations": [{"operation":"sum",  "column":"id"}]}]}'
+
+http://localhost:3000/api/calls
+
+
+curl -X POST http://localhost:3000/api/analytics -H "Content-Type: application/json" -d "{}"
