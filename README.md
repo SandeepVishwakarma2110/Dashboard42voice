@@ -1,2 +1,1 @@
-# Dashboard42voice
-vapi dashboard
+Vapi Dashboard
