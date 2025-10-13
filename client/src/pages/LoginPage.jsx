@@ -87,7 +87,7 @@ const LoginPage = ({ onLogin }) => {
     try {
       const response = await axios.post('/api/auth/login', formData);
       
-      // --- THIS IS THE KEY FIX ---
+     
       // 2. Call the onLogin function with the new token.
       // This updates the state in App.jsx, which triggers the redirect.
       onLogin(response.data.token);
