@@ -85,7 +85,7 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', formData);
+      const response = await axios.post('/api/auth/login', formData);
       
       // --- THIS IS THE KEY FIX ---
       // 2. Call the onLogin function with the new token.
