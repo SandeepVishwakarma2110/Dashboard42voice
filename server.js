@@ -57,11 +57,61 @@
 //   console.log(`🚀 Server is listening on http://localhost:${PORT}`);
 // });
 
-
+// ********************************************************************************************************************************************
 // File: src/server.js
 // This is the definitive version with the correct __dirname implementation for ES Modules.
 // File: server.js
 // This file is now located in the project root and has updated paths.
+
+// import express from 'express';
+// import helmet from 'helmet';
+// import morgan from 'morgan';
+// import cors from 'cors';
+// import 'dotenv/config';
+// import path from 'path';
+// import { fileURLToPath } from 'url';
+
+// // --- FIX: Updated paths to match the new '/server' folder structure ---
+// import callRoutes from './server/routes/callRoutes.js';
+// import authRoutes from './server/routes/authRoutes.js';
+
+// // --- Server Setup ---
+// const app = express();
+// const PORT = process.env.PORT || 3000;
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// // --- Middleware ---
+// app.use(express.json());
+// app.use(helmet());
+// app.use(morgan('dev'));
+// app.use(cors());
+
+// // --- API Routes ---
+// app.use('/api/calls', callRoutes);
+// app.use('/api/auth', authRoutes);
+
+// // --- Serve Frontend ---
+// // --- FIX: Corrected path to the 'client/dist' folder from the root ---
+// app.use(express.static(path.join(__dirname, 'client', 'dist')));
+
+// // The "catchall" handler
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+// });
+
+// // --- Start Server ---
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server is listening on http://localhost:${PORT}`);
+// });
+
+
+
+// ********************************************************************************************************************************************
+
+// File: server.js
+// Updated to include userRoutes.
 
 import express from 'express';
 import helmet from 'helmet';
@@ -71,18 +121,16 @@ import 'dotenv/config';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// --- FIX: Updated paths to match the new '/server' folder structure ---
 import callRoutes from './server/routes/callRoutes.js';
 import authRoutes from './server/routes/authRoutes.js';
+import userRoutes from './server/routes/userRoutes.js'; // 1. Import user routes
 
-// --- Server Setup ---
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- Middleware ---
 app.use(express.json());
 app.use(helmet());
 app.use(morgan('dev'));
@@ -91,12 +139,10 @@ app.use(cors());
 // --- API Routes ---
 app.use('/api/calls', callRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes); // 2. Use user routes
 
 // --- Serve Frontend ---
-// --- FIX: Corrected path to the 'client/dist' folder from the root ---
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
-
-// The "catchall" handler
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 });
@@ -105,3 +151,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server is listening on http://localhost:${PORT}`);
 });
+

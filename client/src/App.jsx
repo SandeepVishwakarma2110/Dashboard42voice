@@ -245,62 +245,191 @@
 // File: client/src/App.jsx
 // This is the final, robust version that handles token expiration gracefully.
 
+// import { useState, useEffect } from 'react';
+// import { Routes, Route, Navigate } from 'react-router-dom';
+// import LoginPage from './pages/LoginPage';
+// import RegistrationPage from './pages/RegistrationPage';
+// import DashboardPage from './pages/DashboardPage';
+// import Loader from './components/Loader';
+// import { verifyUserToken } from './services/api';
+
+// function App() {
+//   const [token, setToken] = useState(localStorage.getItem('token'));
+//   const [isAuthenticating, setIsAuthenticating] = useState(true); // Start in loading state
+
+//   useEffect(() => {
+//     const checkToken = async () => {
+//       const storedToken = localStorage.getItem('token');
+//       if (storedToken) {
+//         try {
+//           // If verifyUserToken succeeds, the token is valid.
+//           await verifyUserToken();
+//           setToken(storedToken);
+//         } catch (error) {
+//           // If it fails, the token is expired/invalid. Log the user out.
+//           console.log("Token verification failed, logging out.");
+//           handleLogout();
+//         }
+//       }
+//       setIsAuthenticating(false); // Finished checking, stop loading
+//     };
+
+//     checkToken();
+//   }, []);
+
+//   const handleLogin = (newToken) => {
+//     localStorage.setItem('token', newToken);
+//     setToken(newToken);
+//   };
+
+//   const handleLogout = () => {
+//     localStorage.removeItem('token');
+//     setToken(null);
+//   };
+
+//   // While checking the token, show a full-page loader
+//   if (isAuthenticating) {
+//     return <Loader />;
+//   }
+
+//   return (
+//     <Routes>
+//       <Route path="/" element={<Navigate to={token ? "/dashboard" : "/login"} />} />
+//       <Route path="/login" element={!token ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />} />
+//       <Route path="/register" element={!token ? <RegistrationPage /> : <Navigate to="/dashboard" />} />
+//       <Route path="/dashboard" element={token ? <DashboardPage onLogout={handleLogout} /> : <Navigate to="/login" />} />
+//     </Routes>
+//   );
+// }
+
+// export default App;
+// ******************************************************************************************************************************************
+
+// File: client/src/App.jsx
+// Final version for Phase 2 RBAC. Handles routing based on role.
+
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage';
 import DashboardPage from './pages/DashboardPage';
+import ClientSelectionPage from './pages/ClientSelectionPage'; // Import new page
 import Loader from './components/Loader';
 import { verifyUserToken } from './services/api';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
-  const [isAuthenticating, setIsAuthenticating] = useState(true); // Start in loading state
+  const [user, setUser] = useState(null); // Store user info { id, email, role }
+  const [isAuthenticating, setIsAuthenticating] = useState(true); // Start loading
 
+  // Effect to verify token on initial load
   useEffect(() => {
     const checkToken = async () => {
       const storedToken = localStorage.getItem('token');
       if (storedToken) {
         try {
-          // If verifyUserToken succeeds, the token is valid.
-          await verifyUserToken();
-          setToken(storedToken);
+          const verifiedUser = await verifyUserToken();
+          setUser(verifiedUser); // Store user details { id, email, role }
+          setToken(storedToken); // Confirm token is valid
         } catch (error) {
-          // If it fails, the token is expired/invalid. Log the user out.
           console.log("Token verification failed, logging out.");
-          handleLogout();
+          handleLogout(); // Token invalid/expired
         }
       }
-      setIsAuthenticating(false); // Finished checking, stop loading
+      setIsAuthenticating(false); // Finished check
     };
-
     checkToken();
   }, []);
 
-  const handleLogin = (newToken) => {
+  // Effect to listen for storage changes (e.g., logout in another tab)
+  useEffect(() => {
+      const handleStorageChange = () => {
+          const currentToken = localStorage.getItem('token');
+          setToken(currentToken);
+          if (!currentToken) {
+              setUser(null); // Clear user if token is removed
+          }
+      };
+      window.addEventListener('storage', handleStorageChange);
+      return () => {
+          window.removeEventListener('storage', handleStorageChange);
+      };
+  }, []);
+
+
+  // Called by LoginPage on successful login
+  const handleLogin = (newToken, loggedInUser) => {
     localStorage.setItem('token', newToken);
     setToken(newToken);
+    setUser(loggedInUser); // Store user details { id, email, role }
   };
 
+  // Called by DashboardPage or ClientSelectionPage
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken(null);
+    setUser(null);
   };
 
-  // While checking the token, show a full-page loader
+  // Show loader while verifying token
   if (isAuthenticating) {
     return <Loader />;
   }
 
+  // Component to protect routes that require authentication
+  const ProtectedRoute = ({ children }) => {
+    return token ? children : <Navigate to="/login" />;
+  };
+
+  // Component to determine the correct landing page after login/refresh
+  const HomeRedirect = () => {
+      if (!token || !user) return <Navigate to="/login" />;
+      // Clients go to dashboard, others go to client selection
+      return user.role === 'client' ? <Navigate to="/dashboard" /> : <Navigate to="/select-client" />;
+  }
+
   return (
+    // Note: <BrowserRouter> is correctly placed in src/main.jsx
     <Routes>
-      <Route path="/" element={<Navigate to={token ? "/dashboard" : "/login"} />} />
-      <Route path="/login" element={!token ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />} />
-      <Route path="/register" element={!token ? <RegistrationPage /> : <Navigate to="/dashboard" />} />
-      <Route path="/dashboard" element={token ? <DashboardPage onLogout={handleLogout} /> : <Navigate to="/login" />} />
+      {/* Root path redirects based on role */}
+      <Route path="/" element={<HomeRedirect />} />
+
+      {/* Login/Register only accessible when logged out */}
+      <Route path="/login" element={!token ? <LoginPage onLogin={handleLogin} /> : <HomeRedirect />} />
+      <Route path="/register" element={!token ? <RegistrationPage /> : <HomeRedirect />} />
+
+      {/* Client Selection page for supervisor/admin */}
+      <Route
+        path="/select-client"
+        element={
+          <ProtectedRoute>
+            {/* Ensure user is loaded before checking role */}
+            {user && (user.role === 'supervisor' || user.role === 'admin') ? (
+              <ClientSelectionPage onLogout={handleLogout} />
+            ) : (
+              // If user is loaded but is a client, redirect them
+              user ? <Navigate to="/dashboard" /> : null // Avoid rendering null during auth check
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Dashboard page */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+             {/* Pass user details and logout handler */}
+            <DashboardPage user={user} onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all route for unknown paths */}
+       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }
 
 export default App;
-// ******************************************************************************************************************************************
+

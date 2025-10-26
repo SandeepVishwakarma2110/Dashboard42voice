@@ -1,152 +1,107 @@
-// // File: src/pages/LoginPage.jsx
-// // ACTION: Create this new file.
 
-// import { useState } from 'react';
-// import { Link, useNavigate } from 'react-router-dom';
-// import axios from 'axios';
+// **************************************************************************************************
 
-// const API_BASE_URL = 'http://localhost:3000/api/auth';
-
-// const LoginPage = () => {
-//     const [formData, setFormData] = useState({ email: '', password: '' });
-//     const [error, setError] = useState('');
-//     const navigate = useNavigate();
-
-//     const handleChange = (e) => {
-//         setFormData({ ...formData, [e.target.name]: e.target.value });
-//     };
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         setError('');
-//         try {
-//             const response = await axios.post(`${API_BASE_URL}/login`, formData);
-//             localStorage.setItem('token', response.data.token); // Store token 
-//             navigate('/dashboard'); // Redirect to dashboard
-//         } catch (err) {
-//             setError(err.response?.data?.message || 'Login failed. Please try again.');
-//         }
-//     };
-
-//     return (
-//         <div className="flex items-center justify-center min-h-screen bg-gray-900">
-//             <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg">
-//                 <h1 className="text-3xl font-bold text-center text-white">Login</h1>
-//                 <form onSubmit={handleSubmit} className="space-y-6">
-//                     <div>
-//                         <label className="block text-sm font-medium text-gray-300">Email</label>
-//                         <input type="email" name="email" onChange={handleChange} required className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-//                     </div>
-//                     <div>
-//                         <label className="block text-sm font-medium text-gray-300">Password</label>
-//                         <input type="password" name="password" onChange={handleChange} required className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-//                     </div>
-//                     {error && <p className="text-sm text-red-400">{error}</p>}
-//                     <button type="submit" className="w-full py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Login</button>
-//                 </form>
-//                 <p className="text-sm text-center text-gray-400">
-//                     Don't have an account? <Link to="/register" className="font-medium text-blue-400 hover:underline">Register here</Link>
-//                 </p>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default LoginPage;
-
-
-// File: src/pages/LoginPage.jsx
-// This component has been updated to trigger the state change in App.jsx.
+// File: client/src/pages/LoginPage.jsx
+// Updated handleSubmit to pass the complete user object (including ID) to onLogin.
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// 1. Accept the 'onLogin' function as a prop from App.jsx
+const API_BASE_URL = '/api/auth';
+
 const LoginPage = ({ onLogin }) => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-    if (!formData.email || !formData.password) {
-      setError('Please enter both email and password.');
-      setLoading(false);
-      return;
-    }
+        if (!formData.email || !formData.password) {
+            setError('Please enter both email and password.');
+            setLoading(false);
+            return;
+        }
 
-    try {
-      const response = await axios.post('/api/auth/login', formData);
-      
-     
-      // 2. Call the onLogin function with the new token.
-      // This updates the state in App.jsx, which triggers the redirect.
-      onLogin(response.data.token);
-      
-      // 3. Although the state change will cause a redirect, we can
-      //    also navigate programmatically for a faster user experience.
-      navigate('/dashboard');
+        try {
+            const response = await axios.post(`${API_BASE_URL}/login`, formData);
 
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+            // --- FIX: Create the userDetails object using data from the response ---
+            const userDetails = {
+                email: formData.email, // Keep email from form data
+                role: response.data.role, // Get role from response
+                id: response.data.id      // Get ID from response
+            };
+            console.log("LoginPage handleSubmit: Calling onLogin with:", response.data.token, userDetails); // Add log
+            onLogin(response.data.token, userDetails); // Pass the complete object
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
-      <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-bold text-center text-white">Login</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300">Email</label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={handleChange}
-              required
-            />
-          </div>
-          {error && <p className="text-sm text-red-400 text-center">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        <p className="text-sm text-center text-gray-400">
-          Don't have an account? <Link to="/register" className="font-medium text-blue-400 hover:underline">Register here</Link>
-        </p>
-      </div>
-    </div>
-  );
+        } catch (err) {
+            setError(err.response?.data?.message || 'Login failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ... rest of the component's return statement remains the same ...
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-gray-900">
+            <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg">
+                <h1 className="text-3xl font-bold text-center text-white">Login</h1>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-300">Email Address</label>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            autoComplete="email"
+                            required
+                            className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+                            placeholder="you@example.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            autoComplete="current-password"
+                            required
+                            className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+                            placeholder="••••••••"
+                            value={formData.password}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+                    >
+                        {loading ? 'Logging in...' : 'Sign in'}
+                    </button>
+                </form>
+                <p className="text-sm text-center text-gray-400">
+                    Don't have an account?{' '}
+                    <Link to="/register" className="font-medium text-blue-400 hover:text-blue-300 hover:underline">
+                        Register here
+                    </Link>
+                </p>
+            </div>
+        </div>
+    );
 };
 
 export default LoginPage;
-
 
