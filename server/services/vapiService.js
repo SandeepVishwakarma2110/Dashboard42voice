@@ -606,7 +606,7 @@ export const fetchAnalyticsData = async (loggedInUser, requestedClientId) => {
     // Standard operations for the main dashboard KPIs
     const defaultOperations = [
         { operation: "count", column: "id" },
-        { operation: "sum", column: "cost" },
+        { operation: "max", column: "duration" },
         { operation: "sum", column: "duration" },
         { operation: "avg", column: "duration" }
     ];
