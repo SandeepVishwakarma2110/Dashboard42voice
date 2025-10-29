@@ -68,7 +68,9 @@
 // Updated outcomeChartData calculation to correctly handle endedReason.
 
 import { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,Cell, AreaChart, Area } from 'recharts';
 
 const Charts = ({ calls }) => {
 
@@ -127,10 +129,11 @@ const Charts = ({ calls }) => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6 mb-6 md:mb-8">
             {/* Calls Over Time Chart */}
-            <div className="lg:col-span-3 bg-gray-800 p-4 sm:p-6 rounded-xl shadow-lg">
+            <div className="lg:col-span-3 bg-[#2c2b65] p-4 sm:p-6 rounded-xl shadow-lg">
+                   
                 <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white">Calls Over Time</h2>
-                {callsOverTimeData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
+                {callsOverTimeData.length > 0 ? (     
+                    <ResponsiveContainer width="100%" height={300}  >
                         <AreaChart data={callsOverTimeData} margin={{ top: 5, right: 20, left: -15, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                             <XAxis dataKey="date" stroke="#9ca3af" fontSize={10} tickFormatter={(tick) => tick.substring(5)} />{/* Show MM-DD */}
@@ -142,10 +145,11 @@ const Charts = ({ calls }) => {
                 ) : (
                      <div className="h-[300px] flex items-center justify-center text-gray-500">No call data available for this period.</div>
                 )}
+                
             </div>
 
             {/* Call Outcomes Chart */}
-            <div className="lg:col-span-2 bg-gray-800 p-4 sm:p-6 rounded-xl shadow-lg">
+            <div className="lg:col-span-2 bg-[#2c2b65] p-4 sm:p-6 rounded-xl shadow-lg">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white">Call Outcomes</h2>
                  {outcomeChartData.length > 0 ? (
                     <ResponsiveContainer width="100%" height={300}>
@@ -164,6 +168,8 @@ const Charts = ({ calls }) => {
             </div>
         </div>
     );
+    
+  
 };
 
 export default Charts;

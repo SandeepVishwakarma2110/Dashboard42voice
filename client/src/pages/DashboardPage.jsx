@@ -254,47 +254,47 @@ import CallTable from '../components/CallTable';
 import Loader from '../components/Loader';
 import ErrorMessage from '../components/ErrorMessage';
 import logo from '../assets/logo.jpeg';
-import { Phone, Timer, Clock, BarChart3, LogOut, ArrowLeft } from 'lucide-react'; // Timer icon for Max Duration
+import { Phone, Timer, Clock, BarChart3, LogOut, ArrowLeft } from 'lucide-react';
 
 const DashboardPage = ({ user, onLogout }) => {
     const [analyticsData, setAnalyticsData] = useState(null);
     const [calls, setCalls] = useState([]);
-    const [loading, setLoading] = useState(true); // Start loading initially
+    const [loading, setLoading] = useState(true); 
     const [error, setError] = useState(null);
     const [currentClientDisplayInfo, setCurrentClientDisplayInfo] = useState('Loading...');
 
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Determine the client ID based on user role and navigation state
+    
     const clientIdToFetch = useMemo(() => {
         console.log("DashboardPage useMemo: Recalculating clientIdToFetch. User:", user);
         if (!user || !user.id || !user.role) {
-            console.log("DashboardPage useMemo: User prop incomplete or null. Returning null.");
+            //console.log("DashboardPage useMemo: User prop incomplete or null. Returning null.");
             return null;
         }
         if (user.role === 'client') {
-            console.log("DashboardPage useMemo: User is client. Returning ID:", user.id);
+            //console.log("DashboardPage useMemo: User is client. Returning ID:", user.id);
             return user.id;
         }
         const selectedId = location.state?.selectedClientId;
-        console.log("DashboardPage useMemo: User is supervisor/admin. selectedClientId:", selectedId);
+        //console.log("DashboardPage useMemo: User is supervisor/admin. selectedClientId:", selectedId);
         return selectedId || null;
     }, [user, location.state]);
 
-    // Effect to fetch data when clientIdToFetch is valid
+    
     useEffect(() => {
         console.log("DashboardPage useEffect: Running effect. clientIdToFetch:", clientIdToFetch);
 
         if (clientIdToFetch === null || clientIdToFetch === undefined) {
-            console.log("DashboardPage useEffect: clientIdToFetch is null or undefined. Waiting or redirecting.");
-            // Redirect supervisor/admin if they land here without selection state
+            //console.log("DashboardPage useEffect: clientIdToFetch is null or undefined. Waiting or redirecting.");
+          
             if (user && user.role !== 'client' && !location.state?.selectedClientId) {
-                console.warn("DashboardPage useEffect: Supervisor/Admin landed without state. Redirecting.");
+                //console.warn("DashboardPage useEffect: Supervisor/Admin landed without state. Redirecting.");
                 navigate('/select-client');
                 return;
             }
-            // If client user is loaded but ID is somehow still null, set error
+           
             if (user && user.role === 'client') {
                 setError("Cannot load dashboard: Client ID could not be determined.");
             }
@@ -302,8 +302,8 @@ const DashboardPage = ({ user, onLogout }) => {
             return;
         }
 
-        // Proceed if clientIdToFetch is valid
-        console.log(`DashboardPage useEffect: Proceeding with data load for clientId: ${clientIdToFetch}`);
+        
+       // console.log(`DashboardPage useEffect: Proceeding with data load for clientId: ${clientIdToFetch}`);
         const loadData = async () => {
             setLoading(true);
             setError(null);
@@ -312,11 +312,11 @@ const DashboardPage = ({ user, onLogout }) => {
             setCurrentClientDisplayInfo(`Client ID: ${clientIdToFetch}`);
 
             try {
-                // Fetch both analytics and calls concurrently
+               
                 const { analyticsData, callsData } = await fetchDashboardData(clientIdToFetch);
-                console.log("DashboardPage useEffect: Data fetched successfully.", { analyticsData, callsData });
+                //console.log("DashboardPage useEffect: Data fetched successfully.", { analyticsData, callsData });
 
-                // Calculate duration for each call
+                
                 const augmentedCalls = callsData.map(call => {
                     if (call.startedAt && call.endedAt) {
                         const start = new Date(call.startedAt);
@@ -329,11 +329,11 @@ const DashboardPage = ({ user, onLogout }) => {
                 setAnalyticsData(analyticsData);
                 setCalls(augmentedCalls);
 
-                // Update the display info (client name/email)
+              
                 if (user?.role === 'client') {
                     setCurrentClientDisplayInfo(user.email);
                 } else {
-                    // Fetch client details for display if supervisor/admin
+                // Fetch client details for display if supervisor/admin
                     try {
                         const clients = await fetchManagedClients();
                         const viewedClient = clients.find(c => c.id === clientIdToFetch);
@@ -346,24 +346,22 @@ const DashboardPage = ({ user, onLogout }) => {
             } catch (err) {
                 const errorMsg = err.message || "An error occurred fetching dashboard data.";
                 setError(errorMsg);
-                console.error(`Failed to load dashboard data for client ${clientIdToFetch}:`, err);
+                //console.error(`Failed to load dashboard data for client ${clientIdToFetch}:`, err);
                 setCurrentClientDisplayInfo(`Error Loading Data`);
             } finally {
-                setLoading(false); // Finish loading state
+                setLoading(false); 
             }
         };
         loadData();
-    }, [clientIdToFetch, navigate, user]); // Depend on clientIdToFetch and user object
+    }, [clientIdToFetch, navigate, user]); 
 
-    // Calculate KPI values, now including maxDuration
+ 
     const kpiValues = useMemo(() => {
         if (!analyticsData || !Array.isArray(analyticsData) || analyticsData.length === 0) {
             return { totalCalls: 0, maxDuration: 0, totalDuration: 0, avgDuration: 0 };
         }
         const results = analyticsData[0]?.result?.[0] || {};
-        // Check the exact key name returned by your backend for max duration (e.g., maxDuration or max_duration)
-        // Adjust results.maxDuration if the key name is different in the backend response log.
-        console.log("Analytics results for KPIs:", results);
+        //console.log("Analytics results for KPIs:", results);
         return {
             totalCalls: Number(results.countId) || 0,
             maxDuration: Number(results.maxDuration) || 0, // Assuming key is maxDuration
@@ -376,17 +374,17 @@ const DashboardPage = ({ user, onLogout }) => {
 
     // Show loader if still authenticating in App.jsx or fetching data here
     if (loading || clientIdToFetch === null) {
-        console.log("DashboardPage render: Showing Loader. loading:", loading, "clientIdToFetch:", clientIdToFetch, "user:", user);
-        // Differentiate between initial auth loading and data loading
+        //console.log("DashboardPage render: Showing Loader. loading:", loading, "clientIdToFetch:", clientIdToFetch, "user:", user);
+      
         if (!user && loading) return <Loader message="Authenticating..." />;
         if (loading) return <Loader message="Loading Dashboard Data..." />;
-        // If not loading but ID is null, show error or redirect (handled in effect/return)
+        
     }
 
     // Render the dashboard content
-    console.log("DashboardPage render: Rendering content. Error state:", error);
+    //console.log("DashboardPage render: Rendering content. Error state:", error);
     return (
-        <div className="p-4 sm:p-6 lg:p-8 bg-gray-900 min-h-screen text-gray-200">
+        <div className="p-4 sm:p-6 lg:p-8 bg-[#181737] min-h-screen text-gray-200">
 
             <header className="mb-8 flex justify-between items-center">
                 <div className="flex items-center space-x-4">
@@ -429,14 +427,15 @@ const DashboardPage = ({ user, onLogout }) => {
                 <>
                     {/* KPI Cards including Max Duration */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-                        <KpiCard title="Total Calls" value={kpiValues.totalCalls.toLocaleString()} icon={Phone} color="bg-blue-600" />
-                        <KpiCard title="Max Duration" value={`${(kpiValues.maxDuration).toFixed(2)} min`} icon={Timer} color="bg-purple-600" />
-                        <KpiCard title="Total Duration" value={`${(kpiValues.totalDuration).toFixed(2)} min`} icon={Clock} color="bg-yellow-600" />
-                        <KpiCard title="Avg. Duration" value={`${kpiValues.avgDuration.toFixed(2)} min`} icon={BarChart3} color="bg-indigo-600" />
+                        <KpiCard title="Total Calls" value={kpiValues.totalCalls.toLocaleString()} icon={Phone} color="bg-[#15F39E]" />
+                        <KpiCard title="Max Duration" value={`${(kpiValues.maxDuration).toFixed(2)} min`} icon={Timer} color="bg-[#3E39A1]" />
+                        <KpiCard title="Total Duration" value={`${(kpiValues.totalDuration).toFixed(2)} min`} icon={Clock} color="bg-[#15F39E]" />
+                        <KpiCard title="Avg. Duration" value={`${kpiValues.avgDuration.toFixed(2)} min`} icon={BarChart3} color="bg-[#3E39A1]" />
                     </div>
                     {/* Charts and Table */}
                     <Charts calls={calls} />
-                    <CallTable calls={calls} />
+                    {/*<CallTable calls={calls} /> */}
+                    <CallTable calls={calls} viewedClientId={clientIdToFetch} />
                 </>
             )}
             {/* Show specific error if clientId couldn't be determined after loading */}

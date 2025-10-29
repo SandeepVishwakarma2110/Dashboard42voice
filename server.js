@@ -113,8 +113,81 @@
 // File: server.js
 // Updated to include userRoutes.
 
+// import express from 'express';
+// import helmet from 'helmet';
+// import morgan from 'morgan';
+// import cors from 'cors';
+// import 'dotenv/config';
+// import path from 'path';
+// import { fileURLToPath } from 'url';
+
+// import callRoutes from './server/routes/callRoutes.js';
+// import authRoutes from './server/routes/authRoutes.js';
+// import userRoutes from './server/routes/userRoutes.js'; // 1. Import user routes
+
+// const app = express();
+// const PORT = process.env.PORT || 3000;
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// app.use(express.json());
+// //app.use(helmet());
+
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: {
+//       directives: {
+//         // Start with restrictive defaults
+//         defaultSrc: ["'self'"], // Only allow resources from the same origin by default
+//         // Specify allowed sources for different types
+//         scriptSrc: ["'self'"], // Only scripts from self (adjust if needed for CDNs/inline)
+//         styleSrc: ["'self'", "'unsafe-inline'"], // Allow styles from self and inline styles
+//         imgSrc: ["'self'", "data:"], // Allow images from self and data URLs
+//         connectSrc: ["'self'"], // Allow XHR/fetch only to self (your API)
+//         fontSrc: ["'self'"],    // Allow fonts only from self
+//         objectSrc: ["'none'"],  // Disallow plugins (Flash, etc.)
+//         // --- FIX: Explicitly allow media from self and blob: ---
+//         mediaSrc: ["'self'", "blob:"],
+//         frameSrc: ["'none'"],   // Disallow embedding in frames
+//         workerSrc: ["'self'", "blob:"], // Allow workers from self and blobs (needed for some libs)
+//         upgradeInsecureRequests: [], // Automatically upgrade HTTP requests to HTTPS
+//       },
+//     },
+//     // Keep other helmet defaults enabled unless they cause issues
+//     // crossOriginEmbedderPolicy: false, // Uncomment ONLY if COEP causes issues
+//   })
+// );
+
+
+
+
+// app.use(morgan('dev'));
+// app.use(cors());
+
+// // --- API Routes ---
+// app.use('/api/calls', callRoutes);
+// app.use('/api/auth', authRoutes);
+// app.use('/api/users', userRoutes); // 2. Use user routes
+
+// // --- Serve Frontend ---
+// app.use(express.static(path.join(__dirname, 'client', 'dist')));
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+// });
+
+// // --- Start Server ---
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server is listening on http://localhost:${PORT}`);
+// });
+
+
+
+// File: server.js
+// Manually setting CSP header to allow blob: for media playback.
+
 import express from 'express';
-import helmet from 'helmet';
+import helmet from 'helmet'; // Keep helmet for other security headers
 import morgan from 'morgan';
 import cors from 'cors';
 import 'dotenv/config';
@@ -123,7 +196,7 @@ import { fileURLToPath } from 'url';
 
 import callRoutes from './server/routes/callRoutes.js';
 import authRoutes from './server/routes/authRoutes.js';
-import userRoutes from './server/routes/userRoutes.js'; // 1. Import user routes
+import userRoutes from './server/routes/userRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -131,21 +204,54 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// --- Middleware ---
 app.use(express.json());
-app.use(helmet());
+
+// --- Use Helmet for general security headers BUT disable its CSP ---
+// We will set CSP manually below.
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// --- Manually Set Content Security Policy Header ---
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; " + // Default restrict to self
+    "script-src 'self'; " +   // Scripts from self
+    "style-src 'self' 'unsafe-inline'; " + // Styles from self + inline
+    "img-src 'self' data:; " + // Images from self + data URLs
+    "connect-src 'self'; " + // Fetch/XHR to self (API)
+    "font-src 'self'; " +    // Fonts from self
+    "object-src 'none'; " +  // No plugins
+    "media-src 'self' blob:; " + // *** Allow media from self AND blob: URLs ***
+    "frame-src 'none'; " +   // No iframes
+    "worker-src 'self' blob:; " + // Allow workers
+    "upgrade-insecure-requests;" // Upgrade HTTP to HTTPS
+  );
+  next();
+});
+
+
 app.use(morgan('dev'));
 app.use(cors());
 
 // --- API Routes ---
 app.use('/api/calls', callRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes); // 2. Use user routes
+app.use('/api/users', userRoutes);
 
 // --- Serve Frontend ---
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'), (err) => {
+      if (err) {
+          console.error("Error sending index.html:", err);
+          if (!res.headersSent) {
+               res.status(500).send("Error loading application.");
+          }
+      }
+  });
 });
+
 
 // --- Start Server ---
 app.listen(PORT, () => {

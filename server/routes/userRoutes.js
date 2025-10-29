@@ -1,5 +1,5 @@
 // File: server/routes/userRoutes.js
-// Updated to return client name along with ID and email.
+
 
 import express from 'express';
 import { sql, poolPromise } from '../DB/db.js';
@@ -7,7 +7,7 @@ import protect from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// --- Get Managed Clients Endpoint ---
+
 router.get('/clients', protect, async (req, res) => {
     const loggedInUserId = req.user.id;
     const loggedInUserRole = req.user.role;
@@ -17,7 +17,7 @@ router.get('/clients', protect, async (req, res) => {
         let query;
         let params = {};
 
-        // --- FIX: Add 'name' to the SELECT statement ---
+       
         if (loggedInUserRole === 'admin') {
             query = "SELECT id, email, name FROM VapiUsers WHERE role = 'client'";
         } else if (loggedInUserRole === 'supervisor') {
@@ -34,7 +34,7 @@ router.get('/clients', protect, async (req, res) => {
 
         const result = await request.query(query);
 
-        // Send back the list of clients { id, email, name }
+     
         res.status(200).json(result.recordset);
 
     } catch (error) {

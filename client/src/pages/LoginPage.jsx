@@ -1,6 +1,3 @@
-
-// **************************************************************************************************
-
 // File: client/src/pages/LoginPage.jsx
 // Updated handleSubmit to pass the complete user object (including ID) to onLogin.
 
@@ -11,96 +8,102 @@ import axios from 'axios';
 const API_BASE_URL = '/api/auth';
 
 const LoginPage = ({ onLogin }) => {
-    const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-        if (!formData.email || !formData.password) {
-            setError('Please enter both email and password.');
-            setLoading(false);
-            return;
-        }
+    if (!formData.email || !formData.password) {
+      setError('Please enter both email and password.');
+      setLoading(false);
+      return;
+    }
 
-        try {
-            const response = await axios.post(`${API_BASE_URL}/login`, formData);
+    try {
+      const response = await axios.post(`${API_BASE_URL}/login`, formData);
 
-            // --- FIX: Create the userDetails object using data from the response ---
-            const userDetails = {
-                email: formData.email, // Keep email from form data
-                role: response.data.role, // Get role from response
-                id: response.data.id      // Get ID from response
-            };
-            console.log("LoginPage handleSubmit: Calling onLogin with:", response.data.token, userDetails); // Add log
-            onLogin(response.data.token, userDetails); // Pass the complete object
+      
+      const userDetails = {
+        email: formData.email, 
+        role: response.data.role, 
+        id: response.data.id      
+      };
+      console.log("LoginPage handleSubmit: Calling onLogin with:", response.data.token, userDetails); 
+      onLogin(response.data.token, userDetails); 
 
-        } catch (err) {
-            setError(err.response?.data?.message || 'Login failed. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // ... rest of the component's return statement remains the same ...
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-900">
-            <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg">
-                <h1 className="text-3xl font-bold text-center text-white">Login</h1>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-300">Email Address</label>
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            autoComplete="email"
-                            required
-                            className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
-                            placeholder="you@example.com"
-                            value={formData.email}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            autoComplete="current-password"
-                            required
-                            className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
-                            placeholder="••••••••"
-                            value={formData.password}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    {error && <p className="text-sm text-red-400 text-center">{error}</p>}
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
-                    >
-                        {loading ? 'Logging in...' : 'Sign in'}
-                    </button>
-                </form>
-                <p className="text-sm text-center text-gray-400">
-                    Don't have an account?{' '}
-                    <Link to="/register" className="font-medium text-blue-400 hover:text-blue-300 hover:underline">
-                        Register here
-                    </Link>
-                </p>
-            </div>
-        </div>
-    );
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#181737]">
+      <div className="w-[355px] h-[420px] bg-gradient-to-br from-[#3E39A1] to-[#15F39E] rounded-2xl shadow-lg flex flex-col items-center justify-center p-6 relative">
+        {/* Inner dark box */}
+        <div className="absolute inset-[2px] bg-gradient-to-br from-[#3E39A1] to-[#15F39E] rounded-2xl"></div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="relative z-10 w-full flex flex-col items-center space-y-5"
+        >
+          <h2 className="text-white text-xl font-semibold mb-2">Log In</h2>
+
+          {/* Email */}
+          <div className="w-[80%]">
+            <label className="text-sm text-gray-200 block mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email address"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full bg-[#1E1E2F] text-gray-200 placeholder-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00FFC6] transition-all"
+            />
+          </div>
+
+          {/* Password */}
+          <div className="w-[80%]">
+            <label className="text-sm text-gray-200 block mb-1">Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full bg-[#1E1E2F] text-gray-200 placeholder-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00FFC6] transition-all"
+            />
+          </div>
+
+          {/* Button */}
+          {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-[80%] bg-[#15F39E] hover:bg-[#15F39E] text-black font-medium py-2 rounded-xl transition-colors" >
+            {loading ? 'Logging in...' : 'Sign in'}
+          </button>
+
+          {/* Register */}
+          <p className="text-sm text-gray-300 mt-2">
+            Don’t have an account?{" "}
+            <Link to="/register" className="text-white hover:underline font-bold">
+              Register here
+            </Link>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default LoginPage;
