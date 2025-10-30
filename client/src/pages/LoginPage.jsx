@@ -56,7 +56,7 @@ const LoginPage = ({ onLogin }) => {
           onSubmit={handleSubmit}
           className="relative z-10 w-full flex flex-col items-center space-y-5"
         >
-          <h2 className="text-white text-xl font-semibold mb-2">Log In</h2>
+          <h2 className="text-white text-xl font-semibold mb-2">Log in</h2>
 
           {/* Email */}
           <div className="w-[80%]">
@@ -90,7 +90,7 @@ const LoginPage = ({ onLogin }) => {
             type="submit"
             disabled={loading}
             className="w-[80%] bg-[#15F39E] hover:bg-[#15F39E] text-black font-medium py-2 rounded-xl transition-colors" >
-            {loading ? 'Logging in...' : 'Sign in'}
+            {loading ? 'Logging in...' : 'Log in'}
           </button>
 
           {/* Register */}

@@ -187,7 +187,7 @@
 // Manually setting CSP header to allow blob: for media playback.
 
 import express from 'express';
-import helmet from 'helmet'; // Keep helmet for other security headers
+import helmet from 'helmet'; 
 import morgan from 'morgan';
 import cors from 'cors';
 import 'dotenv/config';
@@ -204,28 +204,27 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- Middleware ---
+
 app.use(express.json());
 
-// --- Use Helmet for general security headers BUT disable its CSP ---
-// We will set CSP manually below.
+
 app.use(helmet({ contentSecurityPolicy: false }));
 
-// --- Manually Set Content Security Policy Header ---
+
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; " + // Default restrict to self
-    "script-src 'self'; " +   // Scripts from self
-    "style-src 'self' 'unsafe-inline'; " + // Styles from self + inline
-    "img-src 'self' data:; " + // Images from self + data URLs
-    "connect-src 'self'; " + // Fetch/XHR to self (API)
-    "font-src 'self'; " +    // Fonts from self
-    "object-src 'none'; " +  // No plugins
-    "media-src 'self' blob:; " + // *** Allow media from self AND blob: URLs ***
-    "frame-src 'none'; " +   // No iframes
-    "worker-src 'self' blob:; " + // Allow workers
-    "upgrade-insecure-requests;" // Upgrade HTTP to HTTPS
+    "default-src 'self'; " + 
+    "script-src 'self'; " +   
+    "style-src 'self' 'unsafe-inline'; " + 
+    "img-src 'self' data:; " + 
+    "connect-src 'self'; " + 
+    "font-src 'self'; " +   
+    "object-src 'none'; " +  
+    "media-src 'self' blob:; " + 
+    "frame-src 'none'; " +   
+    "worker-src 'self' blob:; " + 
+    "upgrade-insecure-requests;" 
   );
   next();
 });

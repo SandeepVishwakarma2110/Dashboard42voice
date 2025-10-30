@@ -13,7 +13,7 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
     const { name, email, password, confirmPassword, vapiKey } = req.body;
     if (!name || !email || !password || !confirmPassword || !vapiKey) {
-        return res.status(400).json({ message: 'Name, email, password, confirm password, and Vapi API key are required.' });
+        return res.status(400).json({ message: 'Name, email, password, confirm password, and API key are required.' });
     }
     if (password !== confirmPassword) {
         return res.status(400).json({ message: 'Passwords do not match.' });

@@ -116,9 +116,9 @@ const Charts = ({ calls }) => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-gray-700 p-2 rounded shadow-lg border border-gray-600">
+                <div className="bg-[#3E39A1] p-2 rounded shadow-lg border border-gray-600">
                     <p className="label text-gray-300 text-sm">{`${label}`}</p>
-                    <p className="intro text-white font-medium">{`${payload[0].name}: ${payload[0].value}`}</p>
+                    <p className="intro text-[#15F39E] font-medium">{`${payload[0].name}: ${payload[0].value}`}</p>
                 </div>
             );
         }
@@ -126,49 +126,127 @@ const Charts = ({ calls }) => {
     };
 
 
-    return (
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6 mb-6 md:mb-8">
-            {/* Calls Over Time Chart */}
-            <div className="lg:col-span-3 bg-[#2c2b65] p-4 sm:p-6 rounded-xl shadow-lg">
+    // return (
+    //     <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6 mb-6 md:mb-8">
+    //         {/* Calls Over Time Chart */}
+    //         <div className="lg:col-span-3 bg-[#2c2b65] p-4 sm:p-6 rounded-xl shadow-lg">
                    
-                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white">Calls Over Time</h2>
-                {callsOverTimeData.length > 0 ? (     
-                    <ResponsiveContainer width="100%" height={300}  >
-                        <AreaChart data={callsOverTimeData} margin={{ top: 5, right: 20, left: -15, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                            <XAxis dataKey="date" stroke="#9ca3af" fontSize={10} tickFormatter={(tick) => tick.substring(5)} />{/* Show MM-DD */}
-                            <YAxis stroke="#9ca3af" fontSize={10} allowDecimals={false} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Area type="monotone" dataKey="count" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} name="Calls" />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                ) : (
-                     <div className="h-[300px] flex items-center justify-center text-gray-500">No call data available for this period.</div>
-                )}
+    //             <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white">Calls Over Time</h2>
+    //             {callsOverTimeData.length > 0 ? (     
+    //                 <ResponsiveContainer width="100%" height={300}  >
+    //                     <AreaChart data={callsOverTimeData} margin={{ top: 5, right: 20, left: -15, bottom: 5 }}>
+    //                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+    //                         <XAxis dataKey="date" stroke="#9ca3af" fontSize={10} tickFormatter={(tick) => tick.substring(5)} />{/* Show MM-DD */}
+    //                         <YAxis stroke="#9ca3af" fontSize={10} allowDecimals={false} />
+    //                         <Tooltip content={<CustomTooltip />} />
+    //                         <Area type="monotone" dataKey="count" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} name="Calls" />
+    //                     </AreaChart>
+    //                 </ResponsiveContainer>
+    //             ) : (
+    //                  <div className="h-[300px] flex items-center justify-center text-gray-500">No call data available for this period.</div>
+    //             )}
                 
-            </div>
+    //         </div>
 
-            {/* Call Outcomes Chart */}
-            <div className="lg:col-span-2 bg-[#2c2b65] p-4 sm:p-6 rounded-xl shadow-lg">
-                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white">Call Outcomes</h2>
-                 {outcomeChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={outcomeChartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" horizontal={false} />{/* Vertical grid lines */}
-                            <XAxis type="number" stroke="#9ca3af" fontSize={10} allowDecimals={false} />
-                            {/* Increased width for YAxis labels */}
-                            <YAxis type="category" dataKey="name" stroke="#9ca3af" fontSize={10} width={100} tick={{ fill: '#d1d5db' }} />
-                            <Tooltip content={<CustomTooltip />} cursor={{fill: '#374151'}} />
-                            <Bar dataKey="count" fill="#3b82f6" name="Total Calls" barSize={20} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                 ) : (
-                     <div className="h-[300px] flex items-center justify-center text-gray-500">No outcome data available.</div>
-                 )}
-            </div>
-        </div>
-    );
+    //         {/* Call Outcomes Chart */}
+    //         <div className="lg:col-span-2 bg-[#2c2b65] p-4 sm:p-6 rounded-xl shadow-lg">
+    //             <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white">Call Outcomes</h2>
+    //              {outcomeChartData.length > 0 ? (
+    //                 <ResponsiveContainer width="100%" height={300}>
+    //                     <BarChart data={outcomeChartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+    //                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" horizontal={false} />{/* Vertical grid lines */}
+    //                         <XAxis type="number" stroke="#9ca3af" fontSize={10} allowDecimals={false} />
+    //                         {/* Increased width for YAxis labels */}
+    //                         <YAxis type="category" dataKey="name" stroke="#9ca3af" fontSize={10} width={100} tick={{ fill: '#d1d5db' }} />
+    //                         <Tooltip content={<CustomTooltip />} cursor={{fill: '#374151'}} />
+    //                         <Bar dataKey="count" fill="#3b82f6" name="Total Calls" barSize={20} />
+    //                     </BarChart>
+    //                 </ResponsiveContainer>
+    //              ) : (
+    //                  <div className="h-[300px] flex items-center justify-center text-gray-500">No outcome data available.</div>
+    //              )}
+    //         </div>
+    //     </div>
+    // );
     
+    return (
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6 mb-6 md:mb-8">
+
+      {/* Calls Over Time Chart */}
+      <div className="lg:col-span-3 bg-[#23225b] p-4 sm:p-6 rounded-xl shadow-lg">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white">Calls Over Time</h2>
+        {callsOverTimeData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={callsOverTimeData} margin={{ top: 5, right: 20, left: -15, bottom: 5 }}>
+              <defs>
+                <linearGradient id="colorCalls" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#00FFC6" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#00FFC6" stopOpacity={0.1} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#2c2b65" />
+              <XAxis
+                dataKey="date"
+                stroke="#a1a1c0"
+                fontSize={12}
+                tickFormatter={(tick) => tick.substring(5)}
+              />
+              <YAxis stroke="#a1a1c0" fontSize={12} allowDecimals={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="count"
+                stroke="#00FFC6"
+                fill="url(#colorCalls)"
+                strokeWidth={3}
+                name="Calls"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[300px] flex items-center justify-center text-gray-500">
+            No call data available for this period.
+          </div>
+        )}
+      </div>
+
+      {/* Call Outcomes Chart */}
+      <div className="lg:col-span-2 bg-[#23225b] p-4 sm:p-6 rounded-xl shadow-lg">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white">Call Outcomes</h2>
+        {outcomeChartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart
+              data={outcomeChartData}
+              layout="vertical"
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#2c2b65" horizontal={false} />
+              <XAxis type="number" stroke="#a1a1c0" fontSize={12} allowDecimals={false} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                stroke="#a1a1c0"
+                fontSize={12}
+                width={90}
+                tick={{ fill: '#c5c6e0' }}
+              />S
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#2b2b5b' }} />
+              <Bar dataKey="count" name="Total Calls" barSize={20} radius={[8, 8, 8, 8]}>
+                {outcomeChartData.map((entry, index) => {
+                  const colors = ['#836D4C', '#DBBB92','#737F75','#9A958F','#826B5C','#5DBB63'];
+                  return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                })}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[300px] flex items-center justify-center text-gray-500">
+            No outcome data available.
+          </div>
+        )}
+      </div>
+    </div>
+  );
   
 };
 

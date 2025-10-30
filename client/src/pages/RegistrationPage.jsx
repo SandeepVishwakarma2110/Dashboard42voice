@@ -90,7 +90,7 @@ const RegistrationPage = () => {
                     </div>
                      <div>
                         <label className="block text-sm font-medium text-white">API Key</label>
-                        <input type="text" placeholder='Enter API Key' name="key" onChange={handleChange} required className="w-full px-3 py-2 mt-1 text-white bg-[#1E1E2F] border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#15F39E]/40" />
+                        <input type="text" placeholder='Enter API Key' name="vapiKey" onChange={handleChange} required className="w-full px-3 py-2 mt-1 text-white bg-[#1E1E2F] border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#15F39E]/40" />
                     </div>
                     {error && <p className="text-sm text-red-400">{error}</p>}
                     {success && <p className="text-sm text-green-400">{success}</p>}

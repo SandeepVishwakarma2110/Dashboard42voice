@@ -78,7 +78,7 @@ const ClientSelectionPage = ({ onLogout }) => {
              <div className="absolute top-4 right-4">
                 <button
                     onClick={onLogout}
-                    className="flex items-center px-4 py-2 space-x-2 font-semibold text-white bg-gray-700 rounded-md hover:bg-red-600"
+                    className="flex items-center px-4 py-2 space-x-2 font-semibold text-black bg-gradient-to-br from-[#3E39A1] to-[#15F39E] rounded-md hover:bg-[#15F39E]"
                     title="Logout"
                 >
                     <LogOut size={18} />
